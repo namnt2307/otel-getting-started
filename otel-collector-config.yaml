@@ -1,0 +1,26 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+exporters:
+  logging:
+    loglevel: debug
+  prometheusremotewrite:
+    endpoint: http://victoriametrics:8428/api/v1/write
+
+processors:
+  batch:
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging]
+      processors: [batch]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheusremotewrite,logging]
+      processors: [batch]
+
+
+# docker run -p 4317:4317 -d -it -v otel-collector-config.yaml:/etc/otel-collector-config.yaml  otel/opentelemetry-collector:latest  --config=/etc/otel-collector-config.yaml
